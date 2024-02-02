@@ -1,9 +1,8 @@
+use csv;
 use std::process::Command;
 use std::time::SystemTime;
 use std::{error::Error, fs, fs::OpenOptions, path::Path, process};
 use sysinfo::System;
-
-use csv;
 
 fn main() {
     let mut sys = System::new();
@@ -63,9 +62,9 @@ fn make_stats_dir_if_not_exists() -> Result<(), Box<dyn Error>> {
 }
 
 fn write_to_csv() -> Result<(), Box<dyn Error>> {
+    //TODO: move writer declaration and initialisation to main
+    //TODO: then call this function from while loop in main
     let path = "../system_stats/stats.csv";
-
-    //godot_print!("{}", path_globalised); debug
 
     let file = OpenOptions::new()
         .write(true)
