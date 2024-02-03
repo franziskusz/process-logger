@@ -5,6 +5,7 @@ use std::{error::Error, fs, fs::OpenOptions, path::Path, process};
 use sysinfo::System;
 
 fn main() {
+    const PROCESS_NAME: &str = "DodgeRust";
     let mut sys = System::new();
     let mut n = 0;
     let mut timestamp_nanos: u128;
@@ -19,30 +20,32 @@ fn main() {
         process::exit(1);
     }
 
-    print!("timestamp, cpu1, cpu2, cpu3, cpu4, used memory, used swap\n");
+    println!("timestamp, process_id, cpu_usage, memory, virtual_memory, read bytes, written bytes");
 
-    while n < 10 {
+    while n < 100 {
         sys.refresh_cpu();
         sys.refresh_memory();
-        //let components = Components::new_with_refreshed_list();
+        sys.refresh_processes();
+        //let dodge_process = sys.processes_by_exact_name(PROCESS_NAME);
 
         let duration_since_epoch = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap();
         timestamp_nanos = duration_since_epoch.as_nanos();
 
-        print!("{},", timestamp_nanos);
-        for cpu in sys.cpus() {
-            print!(" {}%,", cpu.cpu_usage());
+        for (pid, process) in sys.processes() {
+            if process.name() == PROCESS_NAME {
+                println!(
+                    "{} [{pid}], {:?}%, {}, {}, {}, {}",
+                    timestamp_nanos,
+                    process.cpu_usage(),
+                    process.memory(),
+                    process.virtual_memory(),
+                    process.disk_usage().total_read_bytes,
+                    process.disk_usage().total_written_bytes,
+                );
+            }
         }
-
-        print!(" {},", sys.used_memory());
-        print! {" {}", sys.used_swap()};
-
-        //for component in &components {
-        //    print!("{component:?}");
-        //}
-        print!("\n");
 
         let mut wait = Command::new("sleep").arg("1").spawn().unwrap();
         let _result = wait.wait().unwrap();
