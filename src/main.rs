@@ -23,11 +23,17 @@ fn main() {
         .open(path)
         .unwrap();
 
+    let file_size = std::fs::metadata(path)
+        .expect("file metadata not found")
+        .len();
+
     let mut writer = csv::Writer::from_writer(file);
 
-    if let Err(err) = write_header(&mut writer) {
-        print!("{}", err);
-        process::exit(1);
+    if file_size == 0 {
+        if let Err(err) = write_header(&mut writer) {
+            print!("{}", err);
+            process::exit(1);
+        }
     }
 
     println!("timestamp, process_id, cpu_usage, memory, virtual_memory, read bytes, written bytes");
