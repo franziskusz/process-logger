@@ -8,7 +8,7 @@ fn main() {
     const PROCESS_NAME: &str = "DodgeRust";
     let mut sys = System::new();
     let mut n = 0;
-    let mut timestamp_nanos: u128;
+    let mut timestamp_micros: u128;
     let path = "../system_stats/stats.csv";
 
     if let Err(err) = make_stats_dir_if_not_exists() {
@@ -23,9 +23,7 @@ fn main() {
         .open(path)
         .unwrap();
 
-    let file_size = std::fs::metadata(path)
-        .expect("file metadata not found")
-        .len();
+    let file_size = fs::metadata(path).expect("file metadata not found").len();
 
     let mut writer = csv::Writer::from_writer(file);
 
@@ -47,7 +45,7 @@ fn main() {
         let duration_since_epoch = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap();
-        timestamp_nanos = duration_since_epoch.as_nanos();
+        timestamp_micros = duration_since_epoch.as_micros();
 
         for (pid, process) in sys.processes() {
             if process.name() == PROCESS_NAME {
@@ -58,7 +56,7 @@ fn main() {
                 let written_bytes = process.disk_usage().total_written_bytes;
 
                 let args = (
-                    timestamp_nanos,
+                    timestamp_micros,
                     cpu,
                     memory,
                     virtual_mem,
@@ -68,7 +66,7 @@ fn main() {
 
                 println!(
                     "{} [{pid}], {:?}%, {}, {}, {}, {}",
-                    timestamp_nanos,
+                    timestamp_micros,
                     process.cpu_usage(),
                     process.memory(),
                     process.virtual_memory(),
