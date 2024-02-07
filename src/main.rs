@@ -1,7 +1,7 @@
 use csv;
 use std::process::Command;
 use std::time::SystemTime;
-use std::{error::Error, fs, fs::OpenOptions, io::Write, path::Path, process};
+use std::{error::Error, fs, fs::OpenOptions, io, io::Write, path::Path, process};
 use sysinfo::System;
 
 fn main() {
@@ -10,6 +10,16 @@ fn main() {
     let mut n = 0;
     let mut timestamp_micros: u128;
     let path = "../system_stats/stats.csv";
+
+    //results of this can not be used to find process by name, why?
+    //let mut process_name = String::new();
+    //println!("Please enter the name of the process you wish to log.");
+    //io::stdin()
+    //    .read_line(&mut process_name)
+    //    .expect("Failed to read line");
+    //println!("You entered: {process_name}");
+    //let process_name_slice = process_name.as_str();
+    //println!("{process_name_slice}");
 
     if let Err(err) = make_stats_dir_if_not_exists() {
         print!("{}", err);
@@ -36,9 +46,7 @@ fn main() {
 
     println!("timestamp, process_id, cpu_usage, memory, virtual_memory, read bytes, written bytes");
 
-    while n < 100 {
-        sys.refresh_cpu();
-        sys.refresh_memory();
+    while n < 200 {
         sys.refresh_processes();
         //let dodge_process = sys.processes_by_exact_name(PROCESS_NAME);
 
@@ -49,6 +57,7 @@ fn main() {
 
         for (pid, process) in sys.processes() {
             if process.name() == PROCESS_NAME {
+                //use of process_name / process_name_slice does not work here, why?
                 let cpu = process.cpu_usage();
                 let memory = process.memory();
                 let virtual_mem = process.virtual_memory();
