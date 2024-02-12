@@ -8,6 +8,7 @@ fn main() {
     //const PROCESS_NAME: &str = "DodgeRust";
     let mut sys = System::new();
     let mut n = 0;
+    let logging_duration: u32;
     let mut timestamp_micros: u128;
     let mut path: String = "../process_stats/".to_owned();
     let duration_since_epoch = SystemTime::now()
@@ -23,7 +24,21 @@ fn main() {
         .expect("Failed to read line");
     println!("You entered: {process_name}");
     let process_name_slice = process_name.as_str().trim(); //use trim to remove leading and trailing whitespace
-    println!("{process_name_slice}");
+
+    loop {
+        println!("Please enter the desired logging duration in seconds:");
+        let mut duration = String::new();
+        io::stdin()
+            .read_line(&mut duration)
+            .expect("Failed to read Number");
+        if let Ok(num) = duration.trim().parse::<u32>() {
+            logging_duration = num;
+            println!("logging for {logging_duration} seconds");
+            break;
+        } else {
+            println!("Please enter a valid number.")
+        }
+    }
 
     path.push_str(process_name_slice);
     path.push_str("-");
@@ -58,7 +73,7 @@ fn main() {
 
     println!("timestamp, process_id, cpu_usage, memory, virtual_memory, read bytes, written bytes");
 
-    while n < 200 {
+    while n < logging_duration {
         sys.refresh_processes();
         //let dodge_process = sys.processes_by_exact_name(PROCESS_NAME);
 
