@@ -1,11 +1,11 @@
 use csv;
 use std::process::Command;
 use std::time::SystemTime;
-use std::{error::Error, fs, fs::OpenOptions, io::Write, path::Path, process};
+use std::{error::Error, fs, fs::OpenOptions, io, io::Write, path::Path, process};
 use sysinfo::System;
 
 fn main() {
-    const PROCESS_NAME: &str = "DodgeRust";
+    //const PROCESS_NAME: &str = "DodgeRust";
     let mut sys = System::new();
     let mut n = 0;
     let mut timestamp_micros: u128;
@@ -15,21 +15,21 @@ fn main() {
         .unwrap();
     let timestamp_secs: &str = &*duration_since_epoch.as_secs().to_string();
     let suffix = ".csv";
-    path.push_str(PROCESS_NAME);
+
+    let mut process_name = String::new();
+    println!("Please enter the name of the process you wish to log.");
+    io::stdin()
+        .read_line(&mut process_name)
+        .expect("Failed to read line");
+    println!("You entered: {process_name}");
+    let process_name_slice = process_name.as_str().trim(); //use trim to remove leading and trailing whitespace
+    println!("{process_name_slice}");
+
+    path.push_str(process_name_slice);
     path.push_str("-");
     path.push_str(timestamp_secs);
     path.push_str(suffix);
     let path_str = path.as_str();
-
-    //results of this can not be used to find process by name, why?
-    //let mut process_name = String::new();
-    //println!("Please enter the name of the process you wish to log.");
-    //io::stdin()
-    //    .read_line(&mut process_name)
-    //    .expect("Failed to read line");
-    //println!("You entered: {process_name}");
-    //let process_name_slice = process_name.as_str();
-    //println!("{process_name_slice}");
 
     if let Err(err) = make_stats_dir_if_not_exists() {
         print!("{}", err);
@@ -68,44 +68,50 @@ fn main() {
         timestamp_micros = duration_since_epoch.as_micros();
 
         for (pid, process) in sys.processes() {
-            if process.name() == PROCESS_NAME {
-                //use of process_name / process_name_slice does not work here, why?
-                let cpu = process.cpu_usage();
-                let memory = process.memory();
-                let virtual_mem = process.virtual_memory();
-                let read_bytes = process.disk_usage().total_read_bytes;
-                let written_bytes = process.disk_usage().total_written_bytes;
+            let process_name_var = process.name();
+            //if let process_name_var = process.name() {
+            match process_name_var {
+                //println!("A loop {n}, {process_name_var}"); //debug
+                process_name_var if process_name_var == process_name_slice => {
+                    let cpu = process.cpu_usage();
+                    let memory = process.memory();
+                    let virtual_mem = process.virtual_memory();
+                    let read_bytes = process.disk_usage().total_read_bytes;
+                    let written_bytes = process.disk_usage().total_written_bytes;
 
-                let args = (
-                    timestamp_micros,
-                    cpu,
-                    memory,
-                    virtual_mem,
-                    read_bytes,
-                    written_bytes,
-                );
+                    let args = (
+                        timestamp_micros,
+                        cpu,
+                        memory,
+                        virtual_mem,
+                        read_bytes,
+                        written_bytes,
+                    );
 
-                println!(
-                    "{} [{pid}], {:?}%, {}, {}, {}, {}",
-                    timestamp_micros,
-                    process.cpu_usage(),
-                    process.memory(),
-                    process.virtual_memory(),
-                    process.disk_usage().total_read_bytes,
-                    process.disk_usage().total_written_bytes,
-                );
+                    println!(
+                        "{} [{pid}], {:?}%, {}, {}, {}, {}",
+                        timestamp_micros,
+                        process.cpu_usage(),
+                        process.memory(),
+                        process.virtual_memory(),
+                        process.disk_usage().total_read_bytes,
+                        process.disk_usage().total_written_bytes,
+                    );
 
-                if let Err(err) = write_to_csv(&mut writer, args) {
-                    print!("{}", err);
-                    process::exit(1);
+                    if let Err(err) = write_to_csv(&mut writer, args) {
+                        print!("{}", err);
+                        process::exit(1);
+                    }
                 }
+                _ => {}
             }
         }
 
         let mut wait = Command::new("sleep").arg("1").spawn().unwrap();
         let _result = wait.wait().unwrap();
 
-        n += 1
+        n += 1;
+        //println!("B loop {n}, {process_name_slice}");
     }
 }
 
