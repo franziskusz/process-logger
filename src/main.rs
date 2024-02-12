@@ -1,7 +1,7 @@
 use csv;
 use std::process::Command;
 use std::time::SystemTime;
-use std::{error::Error, fs, fs::OpenOptions, io, io::Write, path::Path, process};
+use std::{error::Error, fs, fs::OpenOptions, io::Write, path::Path, process};
 use sysinfo::System;
 
 fn main() {
@@ -9,7 +9,17 @@ fn main() {
     let mut sys = System::new();
     let mut n = 0;
     let mut timestamp_micros: u128;
-    let path = "../system_stats/stats.csv";
+    let mut path: String = "../process_stats/".to_owned();
+    let duration_since_epoch = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap();
+    let timestamp_secs: &str = &*duration_since_epoch.as_secs().to_string();
+    let suffix = ".csv";
+    path.push_str(PROCESS_NAME);
+    path.push_str("-");
+    path.push_str(timestamp_secs);
+    path.push_str(suffix);
+    let path_str = path.as_str();
 
     //results of this can not be used to find process by name, why?
     //let mut process_name = String::new();
@@ -30,10 +40,12 @@ fn main() {
         .write(true)
         .create(true)
         .append(true) //remove this option if file is ought to be truncated every run
-        .open(path)
+        .open(path_str)
         .unwrap();
 
-    let file_size = fs::metadata(path).expect("file metadata not found").len();
+    let file_size = fs::metadata(path_str)
+        .expect("file metadata not found")
+        .len();
 
     let mut writer = csv::Writer::from_writer(file);
 
@@ -98,7 +110,7 @@ fn main() {
 }
 
 fn make_stats_dir_if_not_exists() -> Result<(), Box<dyn Error>> {
-    let path = "../system_stats/";
+    let path = "../process_stats/";
     if !Path::new(path).exists() {
         fs::create_dir(path)?;
         Ok(())
