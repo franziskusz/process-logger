@@ -4,6 +4,7 @@ This is part of a project to evaluate the godot-rust bindings [gdext](https://gi
 
 The evaluation project consists of four Repositories:
 
+- [overview repository](https://github.com/franziskusz/gdext-evaluation) (contains raw data, results and a description of the evaluation process)
 - [this](https://github.com/franziskusz/process-logger)
 - [Godot Rust benchmark game](https://github.com/franziskusz/dodge-r)
 - [Godot GDScript benchmark game](https://github.com/franziskusz/dodge-gds)
@@ -38,7 +39,7 @@ This is a simple CLI process logger:
 
 ## Notes
 
-- I am new to Rust. This whole project is also a learning experience for me. If the way some things are implemented gives you headaches, I am sorry. I am open for any kind of criticism.
-- Befor the program asks you to enter a process name it will print a message to the shell, if the sysinfo crate supports your operating system
+- I am new to Rust. This whole project is also a learning experience for me. If the way some things are implemented gives you headaches, I apologize. I am open for any kind of criticism.
+- Before the program asks you to enter a process name it will print a message to the shell, if the sysinfo crate supports your operating system
 - .csv logging is based on the Rust crate [csv](https://crates.io/crates/csv)
 - system/process monitoring is based on the Rust crate [sysinfo](https://crates.io/crates/sysinfo)
