@@ -17,6 +17,12 @@ fn main() {
     let timestamp_secs: &str = &*duration_since_epoch.as_secs().to_string();
     let suffix = ".csv";
 
+    if sysinfo::IS_SUPPORTED_SYSTEM {
+        println!("This OS is supported!");
+    } else {
+        println!("This OS isn't supported (yet?).");
+    }
+
     let mut process_name = String::new();
     println!("Please enter the name of the process you wish to log.");
     io::stdin()
