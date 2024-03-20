@@ -13,7 +13,7 @@ The evaluation project consists of four Repositories:
 ## Setup
 
 A:
-If the prebuild executables should not work for you, you can build the project from source with the following steps:
+If the [prebuild executables](https://github.com/franziskusz/process-logger/releases/tag/v0.1.1-alpha) should [not work for you](https://github.com/franziskusz/process-logger/issues/2), you can build the project from source with the following steps:
 1. [Install Rust](https://doc.rust-lang.org/book/ch01-01-installation.html)
 2. Clone this repository by opening a shell and entering:
    - `git clone git@github.com:franziskusz/process-logger.git` (requires having a ssh key setup)
