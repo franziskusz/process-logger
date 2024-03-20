@@ -43,3 +43,4 @@ This is a simple CLI process logger:
 - Before the program asks you to enter a process name it will print a message to the shell, if the sysinfo crate supports your operating system
 - .csv logging is based on the Rust crate [csv](https://crates.io/crates/csv)
 - system/process monitoring is based on the Rust crate [sysinfo](https://crates.io/crates/sysinfo)
+- The `/process_stats/` directory containing the .csv files ***never gets cleared automatically!***
